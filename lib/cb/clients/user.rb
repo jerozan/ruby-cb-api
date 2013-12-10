@@ -6,7 +6,7 @@ module Cb
     class User
       class << self
 
-        def retrieve external_id, test_mode = false
+        def retrieve(external_id, test_mode = false)
           my_api = Cb::Utils::Api.new
           json_hash = my_api.cb_post Cb.configuration.uri_user_retrieve, :body => build_retrieve_request(external_id, true)
 
@@ -20,7 +20,7 @@ module Cb
           my_api.append_api_responses user, json_hash
         end
 
-        def change_password external_id, old_password, new_password, test_mode = false
+        def change_password(external_id, old_password, new_password, test_mode = false)
           result = false
           my_api = Cb::Utils::Api.new
           json_hash = my_api.cb_post Cb.configuration.uri_user_change_password, :body => build_change_password_request(external_id, old_password, new_password, test_mode)
@@ -35,7 +35,7 @@ module Cb
           my_api.append_api_responses result, json_hash
         end
 
-        def delete external_id, password, test_mode = false
+        def delete(external_id, password, test_mode = false)
           result = false
           my_api = Cb::Utils::Api.new
           json_hash = my_api.cb_post Cb.configuration.uri_user_delete, :body => build_delete_request(external_id, password, test_mode)
@@ -51,7 +51,8 @@ module Cb
         end
 
         private
-        def build_retrieve_request external_id, test_mode
+
+        def build_retrieve_request(external_id, test_mode)
           builder = Nokogiri::XML::Builder.new do
             Request {
               ExternalID_ external_id
@@ -63,7 +64,7 @@ module Cb
           builder.to_xml
         end
 
-        def build_change_password_request external_id, old_password, new_password, test_mode
+        def build_change_password_request(external_id, old_password, new_password, test_mode)
           builder = Nokogiri::XML::Builder.new do
             Request {
               ExternalID_ external_id
@@ -77,7 +78,7 @@ module Cb
           builder.to_xml
         end
 
-        def build_delete_request external_id, password, test_mode
+        def build_delete_request(external_id, password, test_mode)
           builder = Nokogiri::XML::Builder.new do
             Request {
               ExternalID_ external_id
