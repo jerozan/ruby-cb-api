@@ -6,6 +6,11 @@ module Cb
     class User
       class << self
 
+        def check_existing(email, password)
+          response = check_existing_api_response(email, password)
+          Cb::Responses::User::CheckExisting.new(response)
+        end
+
         def retrieve(external_id, test_mode = false)
           my_api = Cb::Utils::Api.new
           json_hash = my_api.cb_post Cb.configuration.uri_user_retrieve, :body => build_retrieve_request(external_id, true)
@@ -52,6 +57,25 @@ module Cb
 
         private
 
+        def check_existing_api_response(email, password)
+          xml = build_check_existing_request(email, password)
+          uri = Cb.configuration.uri_user_check_existing
+          api_client.cb_post uri, body: xml
+        end
+
+        def build_check_existing_request(email, password)
+          builder = Nokogiri::XML::Builder.new do
+            Request {
+              DeveloperKey_ Cb.configuration.dev_key
+              Email_ email
+              Password_ password
+              Test_ 'false' # Test flag. Ignored for this request.
+            }
+          end
+
+          builder.to_xml
+        end
+
         def build_retrieve_request(external_id, test_mode)
           builder = Nokogiri::XML::Builder.new do
             Request {
@@ -90,6 +114,11 @@ module Cb
 
           builder.to_xml
         end
+
+        def api_client
+          @api ||= Cb::Utils::Api.new
+        end
+
       end
 
     end

@@ -3,6 +3,24 @@ require 'spec_helper'
 module Cb
     describe Cb::Clients::User do
 
+      describe '#check_existing' do
+        let(:body) do
+          { 'ResponseUserCheck' => { 'Status' => 'Success', 'UserCheckStatus' => 'EmailExistsPasswordsDoNotMatch' } }
+        end
+        before do
+          stub_request(:post, uri_stem(Cb.configuration.uri_user_check_existing)).to_return(body: body.to_json)
+        end
+
+        context 'by interacting with the API client directly' do
+          it 'returns a CheckExisting response' do
+            response = Clients::User.check_existing 'kyle@cb.gov', '1337'
+            response.should be_a Responses::User::CheckExisting
+          end
+        end
+
+
+        end
+
       context '.retrieve' do
         before :each do
           stub_request(:post, uri_stem(Cb.configuration.uri_user_retrieve)).
